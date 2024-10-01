@@ -41,7 +41,7 @@ def getData(baseurl):
             imgSrc = re.findall(findImgSrc, item)[0]
             data.append(imgSrc)
             titles = re.findall(findTitle, item)
-            if (len(titles) == 2):
+            if len(titles) == 2:
                 ctitle = titles[0]
                 data.append(ctitle)
                 otitle = titles[1].replace("/", "")  #消除转义字符
@@ -138,7 +138,3 @@ if __name__ == "__main__":  # 当程序执行时
     main()
     # init_db("movietest.db")
     print("爬取完毕！")
-
-
-
-
