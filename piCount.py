@@ -1,39 +1,55 @@
-from mpmath import mp
-from tqdm import tqdm
+import matplotlib.pyplot as plt
+import numpy as np
 
-# 设置精度（这里设置为1亿位）
-digits = 10 ** 4
-mp.dps = digits  # 设置小数点后的精度
+def vector(*args):
+    # 默认起始点为零向量
+    start = np.array((0, 0))
+    
+    # 检查最后一个参数是否为字符串
+    if len(args) > 0 and isinstance(args[-1], str):
+        # 如果字符串是'1'，则使用默认起始点
+        if args[-1] == '1':
+            vectors = args[:-1]
+        else:
+            # 否则不使用起始点
+            vectors = args
+            start = None
+    else:
+        vectors = args
+    
+    plt.axhline(0, color='black', linewidth=0.5)
+    plt.axvline(0, color='black', linewidth=0.5)
+    
+    # 如果提供了起始点，初始化总和向量为起始点
+    if start is not None:
+        sum_vector = np.array(start)
+    else:
+        # 如果没有提供起始点，则直接从第一个向量开始
+        sum_vector = np.array(vectors[0])
+        vectors = vectors[1:]
+    
+    # 累加所有向量
+    for vec in vectors:
+        sum_vector = np.add(sum_vector, vec)
+    
+    # 绘制从起始点到总和向量的箭头
+    if start is not None:
+        plt.annotate('', xy=tuple(sum_vector), xytext=tuple(start),
+                     arrowprops={'facecolor': 'red', 'arrowstyle': "->"})
+    else:
+        # 如果没有提供起始点，只绘制向量本身
+        plt.annotate('', xy=tuple(sum_vector), xytext=(0, 0),
+                     arrowprops={'facecolor': 'red', 'arrowstyle': "->"})
 
-# Chudnovsky算法
-def compute_pi_chudnovsky():
-	C = 426880 * mp.sqrt(10005)
-	M = 1
-	L = 13591409
-	X = 1
-	K = 6
-	S = L
-	for i in range(1, mp.dps):
-		M = (K ** 3 - 16 * K) * M // i ** 3
-		L += 545140134
-		X *= -262537412640768000
-		S += mp.mpf(M * L) / X
-		K += 12
-		print(i)
-	pi = C / S
-	return pi
+# 使用示例
+k = np.array([1, 3])
+g = np.array([3, 4])
 
+# 不提供起始点，将直接从第一个向量开始
+vector(k, g)
 
-# 计算π
-pi = compute_pi_chudnovsky()
+# 提供起始点
+vector(k, g, '1')
 
-# 将π转换为字符串
-pi_str = str(pi)
-
-# 移除前缀'3.'
-pi_str = pi_str[2:]
-
-# 写入文件
-with open('./pi.txt', 'w') as file:
-	for _ in tqdm(range(digits)):
-		file.write(pi_str)
+# 显示图形
+plt.show()
